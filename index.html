@@ -122,6 +122,8 @@
   }
   .tabs button:hover { color: var(--fg); background: var(--bg); }
   .tabs button[aria-selected="true"] { color: #fff; background: linear-gradient(135deg, var(--hero-2), var(--hero-3)); box-shadow: 0 4px 12px rgba(11, 99, 201, .28); }
+  .tabs button[data-tab="errors"][aria-selected="true"] { background: linear-gradient(135deg, #b71c1c, #e53935); box-shadow: 0 4px 12px rgba(198, 40, 40, .3); }
+  .tabs button[data-tab="faq"][aria-selected="true"] { background: linear-gradient(135deg, #0a3d7a, #0b63c9); }
   .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .tabs .ti { flex: none; display: grid; }
   .tabs .n {
@@ -604,6 +606,7 @@ function drawTabs() {
     const b = document.createElement("button");
     b.type = "button";
     b.setAttribute("role", "tab");
+    b.dataset.tab = key;
     b.setAttribute("aria-selected", key === currentTab);
     b.innerHTML = '<span class="ti"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + t.svg + '</svg></span>' +
       '<span>' + escapeHtml(t.label) + '</span><span class="n">' + t.items.length + "</span>";
