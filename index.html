@@ -86,8 +86,8 @@
     .tabs button { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
     .tabs .n { display: block; margin: 2px 0 0; }
   }
-  @media (max-width: 380px) { .tabs button { font-size: 13px; padding: 8px 1px; } }
-  @media (max-width: 340px) { .tabs { overflow-x: auto; } .tabs button { flex: 0 0 auto; padding: 8px 8px; overflow-wrap: normal; } }
+  @media (max-width: 440px) { .tabs button { font-size: 13px; padding: 8px 1px; } }
+  @media (max-width: 359px) { .tabs { overflow-x: auto; } .tabs button { flex: 0 0 auto; padding: 8px 8px; overflow-wrap: normal; } }
 
   .count { font-size: 14px; color: var(--muted); margin: 0; }
 
@@ -131,6 +131,16 @@
     align-self: flex-start; font: inherit; font-size: 13px; color: var(--accent);
     background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
   }
+
+  .news { display: flex; flex-direction: column; gap: 10px; }
+  .news[hidden] { display: none; }
+  .news h2 { margin: 0; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .post { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 12px;
+          background: var(--accent-soft); border: 1px solid var(--accent); }
+  .post-meta { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+  .post-meta .badge { font-weight: 700; font-size: 12px; color: #fff; background: var(--accent); border-radius: 999px; padding: 1px 9px; }
+  .post p { margin: 0; font-weight: 600; max-width: 70ch; }
+  .post a { align-self: flex-start; font-size: 15px; font-weight: 600; color: var(--accent); text-underline-offset: 3px; }
 
   .browse { display: flex; flex-direction: column; gap: 18px; }
   .browse[hidden], .reader[hidden] { display: none; }
@@ -177,6 +187,8 @@
     <p class="lead">ჩასვით ერორის ტექსტი, დასვით კითხვა ან მოძებნეთ ინსტრუქცია. თითოეულ ჩანაწერზე ნახავთ განმარტებას და მოგვარების გზას.</p>
   </header>
 
+  <section class="news" id="news" aria-label="სიახლეები" hidden></section>
+
   <nav class="tabs" id="tabs" role="tablist" aria-label="განყოფილებები"></nav>
 
   <div id="browse" class="browse">
@@ -208,6 +220,7 @@
 <dialog id="lightbox" aria-label="სქრინი"><img id="lightbox-img" alt=""></dialog>
 
 <script src="instructions.js"></script>
+<script src="news.js"></script>
 <script>
 // ===== 1. THE DATA =====
 // Every error lives here. module = the button it appears under.
@@ -632,12 +645,40 @@ function drawList() {
   });
 }
 
-// ===== 6. INSTRUCTION READER =====
+// ===== 6. NEWS FEED =====
+// A post is shown from its date for "days" days (see news.js).
+const MONTHS = ["იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"];
+function drawNews() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const live = NEWS.filter(n => {
+    const from = new Date(n.date + "T00:00:00");
+    const until = new Date(from); until.setDate(until.getDate() + (n.days || 5));
+    return from <= today && today < until;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+  const box = document.getElementById("news");
+  box.innerHTML = live.length ? "<h2>სიახლეები</h2>" : "";
+  live.forEach(n => {
+    const d = new Date(n.date + "T00:00:00");
+    const guide = n.instruction && TABS.instr.items.find(x => x.id === "i-" + n.instruction);
+    const post = document.createElement("article");
+    post.className = "post";
+    post.innerHTML =
+      '<div class="post-meta"><span class="badge">ახალი</span><span>' + d.getDate() + " " + MONTHS[d.getMonth()] + '</span></div>' +
+      '<p>' + escapeHtml(n.text) + '</p>' +
+      (guide ? '<a href="#' + guide.id + '">ინსტრუქციის ნახვა →</a>' : '');
+    box.append(post);
+  });
+  box.dataset.count = live.length;
+}
+
+// ===== 7. INSTRUCTION READER =====
 // Opened by a "#i-..." link, so the browser's back button returns to the list.
 let openedFromList = false;
 function showReader(e) {
   document.getElementById("browse").hidden = !!e;
   document.getElementById("reader").hidden = !e;
+  const news = document.getElementById("news");
+  news.hidden = !!e || news.dataset.count === "0";
   if (!e) return;
   document.getElementById("reader-module").textContent = e.module;
   document.getElementById("reader-title").textContent = e.title;
@@ -676,6 +717,7 @@ const lightbox = document.getElementById("lightbox");
 lightbox.onclick = () => lightbox.close();
 
 document.getElementById("q").addEventListener("input", drawList);
+drawNews();
 switchTab(currentTab, true);
 route();
 if (/^#[ef]\d+$/.test(location.hash)) {
