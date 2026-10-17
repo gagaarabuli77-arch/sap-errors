@@ -189,10 +189,11 @@
   summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 14px; }
   .icon {
     flex: none; width: 28px; height: 28px; border-radius: 9px; margin-top: 0;
-    background: var(--err-soft); color: var(--err);
+    background: linear-gradient(135deg, #b71c1c, #e53935); color: #fff;
     display: grid; place-items: center; font: 700 15px/1 var(--mono);
+    box-shadow: 0 2px 6px rgba(198, 40, 40, .3);
   }
-  .faq .icon { background: var(--accent-soft); color: var(--accent); }
+  .faq .icon { background: linear-gradient(135deg, #0a3d7a, #0b63c9); color: #fff; box-shadow: 0 2px 6px rgba(11, 99, 201, .3); }
   .faq .msg { font-family: var(--body); font-weight: 600; }
   .sum-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; padding-top: 2px; }
   .msg { font-family: var(--mono), var(--body); font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
@@ -225,7 +226,7 @@
            padding: 15px 16px 15px 18px; cursor: pointer; }
   .instr:hover { border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); transform: translateY(-1px); }
   .instr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .instr .icon { background: var(--teal-soft); color: var(--teal); }
+  .instr .icon { background: linear-gradient(135deg, var(--hero-2), var(--hero-3)); color: #fff; box-shadow: 0 2px 6px rgba(10, 143, 156, .3); }
   .instr .msg { font-family: var(--body); font-weight: 600; }
   .snippet { font-size: 14px; color: var(--muted); }
 
