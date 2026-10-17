@@ -126,5 +126,11 @@ const INSTRUCTIONS = [
   "title": "ფასის თარიღის შეცვლა განაცხადში (ვიდეო)",
   "module": "სერვისი",
   "html": "<video src=\"videos/pricing-date-change.mp4\" controls preload=\"metadata\" playsinline></video>"
+ },
+ {
+  "id": "tires-trade-in",
+  "title": "საბურავების Trade In – ინვოისის შექმნა",
+  "module": "გაყიდვები",
+  "html": "<p>შევდივართ va01 ტრანზაქციაში და ვხსნით ინვოისს სტანდარტულად. საბურავების დატოვების შემთხვევაში გასაყიდი საბურავები უნდა ჩავსვათ ინვოისში სათითაოდ, მაგალითად, თუ ვყიდით ორ საბურავს, ინვოისში უნდა გვქონდეს 2 პოზიცია.</p> <p><img src=\"instructions/tires-trade-in/01.webp\" alt=\"\" loading=\"lazy\"></p> <p>მას შემდეგ, რაც ჩავსვამთ ინვოისში პოზიციებს, უნდა მოვნიშნოთ სათითაოდ, დავაჭიროთ cross selling-ს და მივუთითოთ ჩვენთვის სასურველი საბურავი, ჩავუწეროთ რაოდენობა 1 და დავაჭიროთ copy.</p> <p><img src=\"instructions/tires-trade-in/02.webp\" alt=\"\" loading=\"lazy\"></p> <p><img src=\"instructions/tires-trade-in/03.webp\" alt=\"\" loading=\"lazy\"></p> <p>ვიმეორებთ ამას იმდენჯერ, რამდენი პოზიციაც გვაქვს ინვოისში. დასრულების შემდეგ გასაყიდ საბურავებს გავუწერთ ჩვენს საწყობს, ხოლო დატოვებულ საბურავებს გავუწერთ წუნდებულ საწყობს.</p> <p><img src=\"instructions/tires-trade-in/04.webp\" alt=\"\" loading=\"lazy\"></p> <p>ამით ვასრულებთ პროცესს და ვასეივებთ ინვოისს.</p>"
  }
 ];
