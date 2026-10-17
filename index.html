@@ -761,7 +761,7 @@ function drawNews() {
     post.innerHTML =
       '<div class="post-meta"><span class="badge">ახალი</span><span>' + d.getDate() + " " + MONTHS[d.getMonth()] + '</span></div>' +
       '<p>' + escapeHtml(n.text) + '</p>' +
-      (guide ? '<a href="#' + guide.id + '">იხილეთ ინსტრუქცია <span aria-hidden="true">→</span></a>' : '');
+      (n.instruction ? '<a href="#' + (guide ? guide.id : "i-" + encodeURIComponent(n.instruction)) + '">იხილეთ ინსტრუქცია <span aria-hidden="true">→</span></a>' : '');
     box.append(post);
   });
   box.dataset.count = live.length;
