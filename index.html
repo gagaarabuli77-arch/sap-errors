@@ -2,7 +2,8 @@
 <html lang="ka">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>SAP ერორების ცნობარი</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>SAP ერორების ცნობარი</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -80,6 +81,13 @@
   .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
   .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .tabs .n { font-weight: 400; opacity: .75; margin-left: 6px; font-variant-numeric: tabular-nums; }
+  @media (max-width: 560px) {
+    .tabs { gap: 0; }
+    .tabs button { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+    .tabs .n { display: block; margin: 2px 0 0; }
+  }
+  @media (max-width: 380px) { .tabs button { font-size: 13px; padding: 8px 1px; } }
+  @media (max-width: 340px) { .tabs { overflow-x: auto; } .tabs button { flex: 0 0 auto; padding: 8px 8px; overflow-wrap: normal; } }
 
   .count { font-size: 14px; color: var(--muted); margin: 0; }
 
@@ -124,6 +132,35 @@
     background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
   }
 
+  .browse { display: flex; flex-direction: column; gap: 18px; }
+  .browse[hidden], .reader[hidden] { display: none; }
+
+  .instr { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; font: inherit; color: inherit;
+           padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+  .instr:hover { border-color: var(--accent); }
+  .instr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .instr .icon { background: var(--accent); }
+  .instr .msg { font-family: var(--body); font-weight: 600; }
+  .snippet { font-size: 14px; color: var(--muted); }
+
+  .reader { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .reader-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .back { font: inherit; font-size: 15px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .reader .tag { align-self: flex-start; }
+  .reader h2 { margin: 0; font-size: clamp(21px, 5vw, 26px); line-height: 1.3; text-wrap: balance; }
+  .doc { overflow-wrap: anywhere; }
+  .doc p, .doc li { max-width: 70ch; }
+  .doc h1, .doc h2, .doc h3 { font-size: 18px; margin: 1.4em 0 .4em; }
+  .doc img { display: block; max-width: 100%; height: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: zoom-in; }
+  .doc video { display: block; width: 100%; border-radius: 8px; background: #000; }
+  .doc blockquote { margin: 0; padding-left: 14px; border-left: 3px solid var(--line); }
+  .doc .table-wrap { overflow-x: auto; margin: 10px 0; }
+  .doc table { border-collapse: collapse; font-size: 14px; min-width: 100%; }
+  .doc th, .doc td { border: 1px solid var(--line); padding: 6px 8px; vertical-align: top; text-align: left; }
+  .doc th { background: var(--bg); }
+  .doc a { color: var(--accent); }
+
   mark { background: var(--warn-soft); color: inherit; border-radius: 3px; padding: 0 1px; }
   .empty { text-align: center; color: var(--muted); padding: 32px 16px; background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; }
 
@@ -137,11 +174,12 @@
   <header>
     <span class="eyebrow">SAP · ერორები</span>
     <h1>SAP ერორების ცნობარი</h1>
-    <p class="lead">ჩასვით ერორის ტექსტი ან დასვით კითხვა და აირჩიეთ მოდული. თითოეულ ჩანაწერზე ნახავთ განმარტებას და მოგვარების გზას.</p>
+    <p class="lead">ჩასვით ერორის ტექსტი, დასვით კითხვა ან მოძებნეთ ინსტრუქცია. თითოეულ ჩანაწერზე ნახავთ განმარტებას და მოგვარების გზას.</p>
   </header>
 
   <nav class="tabs" id="tabs" role="tablist" aria-label="განყოფილებები"></nav>
 
+  <div id="browse" class="browse">
   <div>
     <label class="search" for="q">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -154,10 +192,22 @@
 
   <p class="count" id="count"></p>
   <div class="list" id="list"></div>
+  </div>
+
+  <article id="reader" class="reader" hidden>
+    <div class="reader-bar">
+      <button type="button" class="back" id="reader-back">← ყველა ინსტრუქცია</button>
+      <button type="button" class="linkbtn" id="reader-link">ბმულის კოპირება</button>
+    </div>
+    <span class="tag" id="reader-module"></span>
+    <h2 id="reader-title"></h2>
+    <div class="doc" id="reader-body"></div>
+  </article>
 </div>
 
 <dialog id="lightbox" aria-label="სქრინი"><img id="lightbox-img" alt=""></dialog>
 
+<script src="instructions.js"></script>
 <script>
 // ===== 1. THE DATA =====
 // Every error lives here. module = the button it appears under.
@@ -390,12 +440,15 @@ function highlight(text, qWords) {
     .join("");
 }
 
-// Errors and FAQ share one shape: title (error text / question), explanation, answer.
+// Errors, FAQ and instructions share one shape: title, explanation, answer (instructions: their full text).
+const docText = html => new DOMParser().parseFromString(html, "text/html").body.textContent.replace(/\s+/g, " ").trim();
 const TABS = {
   errors: { label: "ერორები", inLabel: "ერორებშიც", icon: "!", answerTitle: "მოგვარება", placeholder: "მაგ: cannot be confirmed due to its status",
             items: ERRORS.map((e, i) => ({ ...e, id: "e" + (i + 1), title: e.error, answer: e.solution })) },
   faq:    { label: "ხშირი კითხვები", inLabel: "ხშირ კითხვებშიც", icon: "?", answerTitle: "პასუხი", placeholder: "მაგ: ძველი თარიღით ზედნადები",
             items: FAQ.map((f, i) => ({ ...f, id: "f" + (i + 1), title: f.question })) },
+  instr:  { label: "ინსტრუქციები", inLabel: "ინსტრუქციებშიც", icon: "i", placeholder: "მაგ: დაბრუნება, ZCART, ინვოისი",
+            items: INSTRUCTIONS.map(x => ({ ...x, id: "i-" + x.id, answer: docText(x.html) })) },
 };
 Object.values(TABS).forEach(t => t.items.forEach(e => {
   Object.assign(e, splitContext(e.title));
@@ -405,9 +458,10 @@ Object.values(TABS).forEach(t => t.items.forEach(e => {
   e.words = new Set(words(e.title + " " + e.explanation + " " + e.answer));
   e.titleWords = new Set(words(e.title));
 }));
+const tabOfHash = h => h.startsWith("#f") ? "faq" : h.startsWith("#i-") ? "instr" : "errors";
 
 // ===== 3. STATE =====
-let currentTab = location.hash.startsWith("#f") ? "faq" : "errors";
+let currentTab = tabOfHash(location.hash);
 let currentModule = "ყველა";   // "ყველა" = all modules
 
 // Search scores each item by how many of your words it contains.
@@ -431,10 +485,12 @@ function search(items, qWords) {
 function modulesOf(tab) {
   return ["ყველა", ...new Set(TABS[tab].items.map(e => e.module))];
 }
-function switchTab(tab) {
+function switchTab(tab, keepHash) {
   currentTab = tab;
   if (!modulesOf(tab).includes(currentModule)) currentModule = "ყველა";
   document.getElementById("q").placeholder = TABS[tab].placeholder;
+  if (!keepHash && location.hash.startsWith("#i-")) history.replaceState(null, "", location.pathname + location.search);
+  showReader(null);
   drawTabs(); drawModules(); drawList();
 }
 
@@ -467,32 +523,73 @@ function drawModules() {
   });
 }
 
+// "Copy link" gives a link straight to one item, to send to a colleague.
+function copyLink(btn, id) {
+  const url = location.href.split("#")[0] + "#" + id;
+  navigator.clipboard.writeText(url)
+    .then(() => { btn.textContent = "დაკოპირდა ✓"; })
+    .catch(() => { btn.textContent = url; });
+  setTimeout(() => { btn.textContent = "ბმულის კოპირება"; }, 2500);
+}
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").showModal();
+}
+// A short piece of an instruction's text around the first search word.
+function snippet(text, qWords) {
+  const lower = text.toLowerCase();
+  const at = Math.min(...qWords.map(w => lower.indexOf(w)).filter(i => i >= 0));
+  if (!isFinite(at)) return "";
+  const start = Math.max(0, at - 50);
+  return (start ? "…" : "") + text.slice(start, at + 90) + "…";
+}
+
 // ===== 5. DRAW THE LIST =====
 function drawList() {
   const tab = TABS[currentTab];
   const qWords = words(document.getElementById("q").value);
   const inModule = e => currentModule === "ყველა" || e.module === currentModule;
   const rows = search(tab.items.filter(inModule), qWords);
+  const showModuleTag = currentModule === "ყველა" && modulesOf(currentTab).length > 2;
 
-  // When searching, also say how many matches the other tab has.
+  // When searching, also say how many matches the other tabs have.
   const count = document.getElementById("count");
   count.textContent = (qWords.length ? "ნაპოვნია: " : tab.label + ": ") + rows.length;
   if (qWords.length) {
-    const other = currentTab === "errors" ? "faq" : "errors";
-    const n = search(TABS[other].items, qWords).length;
-    if (n) {
+    Object.keys(TABS).filter(k => k !== currentTab).forEach(other => {
+      const n = search(TABS[other].items, qWords).length;
+      if (!n) return;
       const b = document.createElement("button");
       b.type = "button"; b.className = "linkbtn";
       b.textContent = TABS[other].inLabel + ": " + n;
       b.onclick = () => switchTab(other);
       count.append(" · ", b);
-    }
+    });
   }
 
   const list = document.getElementById("list");
   list.innerHTML = "";
   if (!rows.length) {
     list.innerHTML = '<div class="empty">ასეთი ჩანაწერი ჯერ არ არის ცნობარში.<br>დაუკავშირდით SAP გუნდს.</div>';
+    return;
+  }
+
+  // Instructions: one row each, opening a full-page reader.
+  if (currentTab === "instr") {
+    rows.forEach(e => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "instr";
+      const snip = qWords.length ? snippet(e.answer, qWords) : "";
+      b.innerHTML =
+        '<span class="icon" aria-hidden="true">i</span>' +
+        '<span class="sum-body">' +
+          '<span class="msg">' + highlight(e.title, qWords) + '</span>' +
+          (snip ? '<span class="snippet">' + highlight(snip, qWords) + '</span>' : '') +
+          (showModuleTag ? '<span class="tags"><span class="tag">' + escapeHtml(e.module) + '</span></span>' : '') +
+        '</span>';
+      b.onclick = () => { openedFromList = true; location.hash = e.id; };
+      list.append(b);
+    });
     return;
   }
 
@@ -508,7 +605,7 @@ function drawList() {
         '<span class="sum-body">' +
           '<span class="msg">' + highlight(e.msg, qWords) + '</span>' +
           '<span class="tags">' +
-            (currentModule === "ყველა" && modulesOf(currentTab).length > 2 ? '<span class="tag">' + escapeHtml(e.module) + '</span>' : '') +
+            (showModuleTag ? '<span class="tag">' + escapeHtml(e.module) + '</span>' : '') +
             (e.when ? '<span class="tag">' + escapeHtml(e.when) + '</span>' : '') +
             (e.needsTeam ? '<span class="tag team">საჭიროა SAP გუნდი</span>' : '') +
             (e.images.length ? '<span class="tag shot">სქრინით</span>' : '') +
@@ -527,30 +624,60 @@ function drawList() {
 
     // Tap a screenshot to see it full size.
     d.querySelectorAll(".shot-btn").forEach(b => {
-      b.onclick = () => {
-        document.getElementById("lightbox-img").src = b.querySelector("img").src;
-        document.getElementById("lightbox").showModal();
-      };
+      b.onclick = () => openLightbox(b.querySelector("img").src);
     });
-
-    // "Copy link" gives a link straight to this item, to send to a colleague.
     const btn = d.querySelector(".linkbtn");
-    btn.onclick = () => {
-      const url = location.href.split("#")[0] + "#" + e.id;
-      navigator.clipboard.writeText(url)
-        .then(() => { btn.textContent = "დაკოპირდა ✓"; })
-        .catch(() => { btn.textContent = url; });
-      setTimeout(() => { btn.textContent = "ბმულის კოპირება"; }, 2500);
-    };
+    btn.onclick = () => copyLink(btn, e.id);
     list.append(d);
   });
 }
+
+// ===== 6. INSTRUCTION READER =====
+// Opened by a "#i-..." link, so the browser's back button returns to the list.
+let openedFromList = false;
+function showReader(e) {
+  document.getElementById("browse").hidden = !!e;
+  document.getElementById("reader").hidden = !e;
+  if (!e) return;
+  document.getElementById("reader-module").textContent = e.module;
+  document.getElementById("reader-title").textContent = e.title;
+  const body = document.getElementById("reader-body");
+  body.innerHTML = e.html;
+  body.querySelectorAll("table").forEach(t => {
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.replaceWith(wrap); wrap.append(t);
+  });
+  body.querySelectorAll("a[href]").forEach(a => { a.target = "_blank"; a.rel = "noopener"; });
+  body.querySelectorAll("img").forEach(img => { img.onclick = () => openLightbox(img.src); });
+  const link = document.getElementById("reader-link");
+  link.onclick = () => copyLink(link, e.id);
+  window.scrollTo(0, 0);
+}
+function route() {
+  const h = location.hash;
+  if (h.startsWith("#i-")) {
+    const e = TABS.instr.items.find(x => "#" + x.id === h);
+    if (e) {
+      if (currentTab !== "instr") { currentTab = "instr"; drawTabs(); drawModules(); drawList(); }
+      showReader(e);
+      return;
+    }
+  }
+  showReader(null);
+}
+document.getElementById("reader-back").onclick = () => {
+  if (openedFromList) { openedFromList = false; history.back(); }
+  else location.hash = "";
+};
+window.addEventListener("hashchange", route);
 
 const lightbox = document.getElementById("lightbox");
 lightbox.onclick = () => lightbox.close();
 
 document.getElementById("q").addEventListener("input", drawList);
-switchTab(currentTab);
+switchTab(currentTab, true);
+route();
 if (/^#[ef]\d+$/.test(location.hash)) {
   const el = document.querySelector(location.hash);
   if (el) el.scrollIntoView({ block: "center" });
